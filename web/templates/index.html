@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demographic and Emotion Estimator</title>
+    <!-- Add jQuery library -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <style>
+        body {
+            background-image: url(static/background.png);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100vh;
+        }
+        form {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .hidden {
+            display:none;
+        }
+        .button {
+            background-color: #125ac5;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            transition-duration: 0.4s;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+        .button:hover {
+            background-color: white;
+            color: black;
+            border: 2px solid #125ac5;
+        }
+        #image-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            margin-left: 400px;
+            margin-right: 400px;
+        }
+        #preview-image{
+            max-width: 350px;
+            height: auto;
+            display: none; /* Initially hide the image */
+            margin-left: 400px;
+            margin-top: 5%;
+        }
+        #processed-image {
+            max-width: 350px;
+            height: auto;
+            display: none; /* Initially hide the image */
+            margin-right: 400px;
+            float: right;
+            margin-left: auto;
+            margin-top: 5%;
+        }
+        #content-container {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="content-container">
+        <h1>Demographic and Emotion Estimator</h1>
+    </div>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <div class="button" id="uploadTrigger">Upload Image</div>
+        <input type="file" name="file" id="file" accept=".jpg, .jpeg, .png" class="hidden" onchange="previewImage()">
+        <input type="submit" value="Predict Labels" class="button">
+    </form>
+
+    <!-- Container for images -->
+    <div id="">
+        <!-- Display the preview image -->
+        <img id="preview-image" src="" alt="Preview Image">
+
+        <!-- Display the processed image -->
+        <img id="processed-image" src="" alt="Processed Image">
+    </div>
+
+    <script>
+
+        $("#uploadTrigger").click(function(){
+           $("#file").click();
+        });
+
+        $(document).ready(function() {
+            // Attach an event listener to the form
+            $('form').submit(function(e) {
+                e.preventDefault();
+
+                // Create a FormData object to send the file
+                var formData = new FormData(this);
+
+                // Make an AJAX request to the server
+                $.ajax({
+                    url: '/upload',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        // Update the page content with the uploaded file name
+                        $('#processed-image').attr('src', "{{ url_for('static', filename='uploads/processed_') }}" + response.image_name);
+                        // Set the display style of the image to inline
+                        $('#processed-image').css('display', 'inline');
+                        // Display the processed image
+                        $('#processed-image').show();
+                    },
+                    error: function(error) {
+                        console.log(error);
+                    }
+                });
+            });
+        });
+
+        function previewImage() {
+            // Get the file input element
+            var fileInput = document.getElementById('file');
+            
+            // Get the preview image element
+            var previewImage = document.getElementById('preview-image');
+            // Get the processed image element
+            var processedImage = document.getElementById('processed-image');
+            
+            // Check if a file is selected
+            if (fileInput.files && fileInput.files[0]) {
+                // Create a FileReader to read the image
+                var reader = new FileReader();
+                
+                // Set the callback function when the image is loaded
+                reader.onload = function (e) {
+                    // Set the source of the preview image to the loaded image data
+                    previewImage.src = e.target.result;
+                    // Display the image
+                    previewImage.style.display = "inline";
+                    //Hide the processed image
+                    processedImage.style.display = "none";
+                }
+                
+                // Read the image file
+                reader.readAsDataURL(fileInput.files[0]);
+            }
+        }
+    </script>
+</body>
+</html>

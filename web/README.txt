@@ -1,0 +1,2 @@
+See sample_input_outputs for some samples.
+If you want to run the model in your local machine, go to https://drive.google.com/drive/folders/1-PhO8XzVhQBWq_EkOltbmD89ihJfEdgf, download the networks file and save it to the directory of server.py. After this, run server.py and input some sample images
